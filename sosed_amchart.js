@@ -1,3 +1,11 @@
+var collector_colors = [
+  "#4287f5", /* light blue */
+  "#4211ab", /* purplish */
+  "#11718f", /* dark lilac? */
+  "#1c9490", /* greenish */
+  "#1c5bad"  /* collector blue */
+]
+
 var categoryAxis;
 var chart;
 var chart_data;
@@ -295,58 +303,143 @@ function sosed_amchart(map_div_id,
         break;
         case "wordcloud":
           
-          var current_response = data[0].separateresponses.split("|")[0];
+          switch(data[0].structure){
+            case "long":
+              //var current_response = data[0].separateresponses.split("|")[0];
         
-          //var current_response = "Helpful";
-          am4core.useTheme(am4themes_animated);
+              //var current_response = "Helpful";
 
-          am4core.useTheme(am4themes_animated);
-          chart = am4core.create(map_div_id, am4plugins_wordCloud.WordCloud);
-          series = chart.series.push(new am4plugins_wordCloud.WordCloudSeries());
+              am4core.useTheme(am4themes_animated);
+              chart = am4core.create(map_div_id, am4plugins_wordCloud.WordCloud);
+              series = chart.series.push(new am4plugins_wordCloud.WordCloudSeries());
 
-          freq_obj = {};
-          valid_columns = data[0].columns.split("|");
-          chart_data = [];
-          
-          valid_columns.forEach(function(column_number){
-            var item = Object.keys(data[0])[column_number];
-            freq_obj[item] = {
-              text: data[0][item],
-              freq: {}
-            };
-            for(var i = 1; i < data.length; i++){
-              if(typeof(freq_obj[item].freq[data[i][item]]) == "undefined"){
-                freq_obj[item].freq[data[i][item]] = 0;
-              }
-              freq_obj[item].freq[data[i][item]]++;
-            }
-          });
-          console.dir("freq_obj");
-          console.dir(freq_obj);
-          
-          series.data = [];
-          
-          Object.keys(freq_obj).forEach(function(this_key){
-            Object.keys(freq_obj[this_key].freq).forEach(function(this_response){
-              if(this_response == current_response){
-                series.data.push({
-                  tag:    freq_obj[this_key].text,
-                  weight: freq_obj[this_key].freq[this_response]
-                });                
-              }
-            });
-          });
-          
-          chart.exporting.menu = new am4core.ExportMenu();
-          series.dataFields.word = "tag";
-          series.dataFields.value = "weight";
-          series.colors = new am4core.ColorSet();
-          series.colors.passOptions = {};
+              /*
+              freq_obj = {};
+              valid_columns = data[0].columns.split("|");
+              chart_data = [];
+              
+              valid_columns.forEach(function(column_number){
+                var item = Object.keys(data[0])[column_number];
+                freq_obj[item] = {
+                  text: data[0][item],
+                  freq: {}
+                };
+                for(var i = 1; i < data.length; i++){
+                  if(typeof(freq_obj[item].freq[data[i][item]]) == "undefined"){
+                    freq_obj[item].freq[data[i][item]] = 0;
+                  }
+                  freq_obj[item].freq[data[i][item]]++;
+                }
+              });
+              */
+              
+              series.data = data;
+              
+              /*
+              Object.keys(freq_obj).forEach(function(this_key){
+                Object.keys(freq_obj[this_key].freq).forEach(function(this_response){
+                  if(this_response == current_response){
+                    series.data.push({
+                      tag:    freq_obj[this_key].text,
+                      weight: freq_obj[this_key].freq[this_response]
+                    });                
+                  }
+                });
+              });
+              */
+              
+              chart.exporting.menu = new am4core.ExportMenu();
+              series.dataFields.word = "tag";
+              series.dataFields.value = "weight";
+              series.fontFamily = "Pacifico";
+              
+              
+              series.labels.template.adapter.add("fill", function (fill, target) {
+                var this_color = collector_colors[Math.floor(Math.random() * collector_colors.length)];
+                
+                return am4core.color(this_color);
+                /*
+                if(typeof(data[0].correct) == "undefined"){
+                  return chart.colors.getIndex(target.dataItem.index);
+                } else {
+                  
+                  var this_index = chart_obj.all_cols.indexOf(chart_obj.current_col);
+                  var this_correct_answer = data[0].correct.split("|")[this_index];
+                  
+                  if(this_correct_answer == target.dataItem.categories.categoryY){
+                    return am4core.color('#5cb85c');
+                  } else {
+                    return am4core.color('#d9534f');
+                  }
+                }
+                */
+              });
+              
+              //series.colors = new am4core.ColorSet();
+              series.colors.passOptions = {};
+              /*
+              series.labels.template.paddingTop = 5;
+              series.labels.template.paddingLeft = 5;
+              series.labels.template.paddingRight = 5;
+              series.labels.template.paddingBottom = 5;
+              */
+              series.labels.template.margin(20,20,20,20);
+            
+              $("#title_h1").html("testing");
+              
+              break;
+            default:
+              var current_response = data[0].separateresponses.split("|")[0];
         
-        
-          $("#title_h1").html(current_response);
-          
-          break;
+              //var current_response = "Helpful";
+              am4core.useTheme(am4themes_animated);
+
+              am4core.useTheme(am4themes_animated);
+              chart = am4core.create(map_div_id, am4plugins_wordCloud.WordCloud);
+              series = chart.series.push(new am4plugins_wordCloud.WordCloudSeries());
+
+              freq_obj = {};
+              valid_columns = data[0].columns.split("|");
+              chart_data = [];
+              
+              valid_columns.forEach(function(column_number){
+                var item = Object.keys(data[0])[column_number];
+                freq_obj[item] = {
+                  text: data[0][item],
+                  freq: {}
+                };
+                for(var i = 1; i < data.length; i++){
+                  if(typeof(freq_obj[item].freq[data[i][item]]) == "undefined"){
+                    freq_obj[item].freq[data[i][item]] = 0;
+                  }
+                  freq_obj[item].freq[data[i][item]]++;
+                }
+              });
+              
+              series.data = [];
+              
+              Object.keys(freq_obj).forEach(function(this_key){
+                Object.keys(freq_obj[this_key].freq).forEach(function(this_response){
+                  if(this_response == current_response){
+                    series.data.push({
+                      tag:    freq_obj[this_key].text,
+                      weight: freq_obj[this_key].freq[this_response]
+                    });                
+                  }
+                });
+              });
+              
+              chart.exporting.menu = new am4core.ExportMenu();
+              series.dataFields.word = "tag";
+              series.dataFields.value = "weight";
+              series.fontFamily = "Pacifico";
+              series.colors = new am4core.ColorSet();
+              series.colors.passOptions = {};
+            
+            
+              $("#title_h1").html(current_response);
+              break;
+          }          
       }
     });
   }
